@@ -1,0 +1,79 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title> yolo 객체 추적</title>
+    <style>
+        *{box-sizing: border-box;}
+        #videoArea{
+            width:640px;
+            /* height:480px;              */
+        }
+        #videoArea img{
+            width:100%;
+            object-fit: contain;
+
+        }
+    </style>
+</head>
+<body>
+    
+    <div>
+        <div>
+            <button onclick="start()">추적 시작</button>
+            <button onclick="">중지</button>
+            <div id="status">대기 중</div>
+        </div>
+        <div id="videoArea">
+
+        </div>
+    </div>
+    <div>
+        <h2> 웹캠 출력장소야</h2>
+        <div>
+            <button onclick="camLink()">카메라 연결</button>
+            <button onclick="camClose()">연결끊기</button>
+        </div>
+        <div id="camArea">
+
+        </div>
+
+    </div>
+
+</body>
+</html>
+
+<script>
+    function camLink(){
+    const cam = document.getElementById("camArea");
+    cam.innerHTML=`
+    <img src = "http://localhost:8000/webcam">`;
+    }
+    function camClose(){
+        const cam = document.getElementById("camArea");
+        cam.innerHTML = "연결 끊김";
+    }
+
+    function start() {
+        const videoArea = document.getElementById("videoArea")
+        const status = document.getElementById("status")
+        videoArea.innerHTML=`
+            <img src="http://localhost:8000/video">
+        `;
+        status.innerText="객체 추적 실행 중"
+    }
+
+    function stop(){
+        const videoArea = document.getElementById("videoArea");
+        const status = document.getElementById("status");
+        videoArea.innerHTML = `<p> 영상이 중지 되었습니다.</p>`;
+        status.innerText="중지됨";
+
+    }
+
+
+
+
+
+</script>
