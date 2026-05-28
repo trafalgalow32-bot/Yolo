@@ -1,12 +1,12 @@
 # yolo_fastapi.py
 
-from fastapi import FastAPI
+from fastapi import FastAPI, Request
 from fastapi.responses import StreamingResponse
 from fastapi.middleware.cors import CORSMiddleware
-from fastapi import Request
 
 from yolo_track_red import tracking_frame
 from cam_test import test_cam
+from webcam_service import record_frames, stop_record
 
 app = FastAPI()
 
@@ -18,10 +18,22 @@ app.add_middleware(
     allow_headers=["*"]
 )
 
+@app.get("/record")
+def record():
+    return StreamingResponse(
+        record_frames(),
+        media_type="multipart/x-mixed-replace; boundary=frame"
+    )
+
+@app.post("/stop")
+def stop():
+    stop_record()
+
+
 @app.get("/webcam")
 async def get_cam(request: Request):
     return StreamingResponse(
-        test_cam(request) ,
+        test_cam(request),
         media_type="multipart/x-mixed-replace; boundary=frame"
     )
 @app.get("/")

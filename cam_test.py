@@ -5,6 +5,9 @@ from ultralytics import YOLO
 from datetime import datetime
 import os
 import json
+import time
+from save_json import save_frame_json
+from save_json import flush_json
 
 model = YOLO("yolov8n.pt")
 
@@ -34,8 +37,8 @@ async def test_cam(request):
     global streaming
     streaming = True
 
-    now = datetime.now().strftime("%Y%m%d_%H%M")
-    json_path = os.path.join("records", f"cam_{now}.json")
+    # now = datetime.now().strftime("%Y%m%d_%H%M")
+    # json_path = os.path.join("records", f"cam_{now}.json")
 
     save_data = {}
     annotations = []
@@ -48,6 +51,11 @@ async def test_cam(request):
         },
         "frames": annotations
     }
+    frame_no = 0
+
+    current_minute = datetime.now().strftime("%Y^%m%d_%H%M")
+    json_path = os.path.join("records", f"cam_{current_minute}.jsonl")
+    
     while streaming:
         if await request.is_disconnected():
             streaming=False
@@ -56,18 +64,24 @@ async def test_cam(request):
         if not ret: break
         res = model(frame, verbose=False)
 
+        frame_no += 1
+
 # 분석 결과 json 저장
-        # annotations.append( make_json( res) )
+        now_minute = datetime.now().strftime("%Y%m%d_%H%M")
+        if now_minute != current_minute:
+            flush_json(json_path)
+
+            current_minute = now_minute
+            json_path = os.path.join("records", f"cam_{now_minute}.json")
+            # annotations.append( make_json( res) )          
+            
+            
         save_data["frames"] = make_json( res )
 
-        # now = datetime.now().strftime("%Y%m%d_%H%M")
-        # json_path = os.path.join("records", f"cam_{now}.json")
-        with open(json_path, "w", encoding="utf-8") as f:
-            json.dump(
-                save_data, f, ensure_ascii=False, indent=4
-            )   
+        save_frame_json(json_path, save_data)            
 
         fr = res[0].plot()
+
         success, buffer = cv2.imencode(
             ".jpg", fr,
             # [cv2.IMWRITE_JPEG_QUALITY, 80]

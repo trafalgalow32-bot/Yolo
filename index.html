@@ -39,17 +39,37 @@
 
         </div>
 
+    <div>
+        <button onclick="startVideo()">녹화시작</button>
+        <button onclick="stopVideo()">녹화중지</button>
+
+        <div id="recordVideo"></div>
+
+    </div>
+
     </div>
 
 </body>
 </html>
 
 <script>
-    function camLink(){
-    const cam = document.getElementById("camArea");
-    cam.innerHTML=`
-    <img src = "http://localhost:8000/webcam">`;
+    function startVideo(){
+        document.getElementById("recordVideo").innerHTML=`
+            <img src = "http://localhost:8000/record">
+        `;
     }
+    async function stopVideo(){
+        document.getElementById("recordVideo").innerHTML="";
+        await fetch("http://localhost:8000/stop",
+            {method:"POST"}
+        );        
+    }
+
+    function camLink(){
+        const cam = document.getElementById("camArea");
+        cam.innerHTML=`
+        <img src = "http://localhost:8000/webcam">`;
+        }
     function camClose(){
         const cam = document.getElementById("camArea");
         cam.innerHTML = "연결 끊김";
